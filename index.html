@@ -20,6 +20,22 @@
       z-index: 0;
     }
 
+    #startScreen {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: lime;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
     #content {
       position: absolute;
       z-index: 1;
@@ -27,7 +43,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
     }
@@ -44,13 +60,12 @@
       background: lime;
       width: 0%;
       height: 100%;
-      animation: load 30s linear forwards;
     }
 
-    @keyframes load {
-      to {
-        width: 100%;
-      }
+    #progressText {
+      font-size: 1.5rem;
+      color: red;
+      margin-bottom: 20px;
     }
 
     #prank {
@@ -75,9 +90,12 @@
 
 <canvas id="matrix"></canvas>
 
+<div id="startScreen">Tap to Begin Decryption</div>
+
 <div id="content">
   <h1>Decrypting Top Secret File...</h1>
   <div id="loading"><div id="bar"></div></div>
+  <div id="progressText">0%</div>
 
   <div id="prank">
     <img id="cat" src="cat.gif" alt="Cat GIF" />
@@ -87,7 +105,7 @@
 </div>
 
 <script>
-  // Matrix Background Animation
+  // Matrix Background
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
 
@@ -102,7 +120,6 @@
   function draw() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     ctx.fillStyle = "#0F0";
     ctx.font = fontSize + "px monospace";
 
@@ -119,15 +136,32 @@
 
   setInterval(draw, 33);
 
-  // Reveal after 30s
-  setTimeout(() => {
-    document.querySelector('#loading').style.display = 'none';
-    document.querySelector('h1').style.display = 'none';
-    const prank = document.querySelector('#prank');
-    prank.style.display = 'block';
-    document.getElementById('laugh').play();
-  }, 30000);
+  // 🔊 Mobile-friendly start trigger
+  document.getElementById('startScreen').addEventListener('click', () => {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('content').style.display = 'flex';
+
+    let progress = 0;
+    const bar = document.getElementById('bar');
+    const text = document.getElementById('progressText');
+
+    const interval = setInterval(() => {
+      progress++;
+      bar.style.width = progress + '%';
+      text.textContent = progress + '%';
+
+      if (progress >= 100) {
+        clearInterval(interval);
+        document.querySelector('#loading').style.display = 'none';
+        document.querySelector('h1').style.display = 'none';
+        text.style.display = 'none';
+        document.querySelector('#prank').style.display = 'block';
+        document.getElementById('laugh').play();
+      }
+    }, 300);
+  });
 </script>
 
 </body>
 </html>
+
