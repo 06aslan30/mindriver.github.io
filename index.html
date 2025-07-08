@@ -37,20 +37,19 @@
       height: 30px;
       border: 2px solid lime;
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     #bar {
       background: lime;
       width: 0%;
       height: 100%;
-      animation: load 30s linear forwards;
     }
 
-    @keyframes load {
-      to {
-        width: 100%;
-      }
+    #progressText {
+      font-size: 1.5rem;
+      color: red;
+      margin-bottom: 20px;
     }
 
     #prank {
@@ -78,6 +77,7 @@
 <div id="content">
   <h1>Decrypting Top Secret File...</h1>
   <div id="loading"><div id="bar"></div></div>
+  <div id="progressText">0%</div>
 
   <div id="prank">
     <img id="cat" src="cat.gif" alt="Cat GIF" />
@@ -87,7 +87,7 @@
 </div>
 
 <script>
-  // Matrix Background Animation
+  // Matrix Rain Effect
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
 
@@ -102,7 +102,6 @@
   function draw() {
     ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     ctx.fillStyle = "#0F0";
     ctx.font = fontSize + "px monospace";
 
@@ -119,15 +118,27 @@
 
   setInterval(draw, 33);
 
-  // Reveal after 30s
-  setTimeout(() => {
-    document.querySelector('#loading').style.display = 'none';
-    document.querySelector('h1').style.display = 'none';
-    const prank = document.querySelector('#prank');
-    prank.style.display = 'block';
-    document.getElementById('laugh').play();
-  }, 30000);
+  // Progress Logic
+  const bar = document.getElementById('bar');
+  const text = document.getElementById('progressText');
+  let progress = 0;
+
+  const interval = setInterval(() => {
+    progress++;
+    bar.style.width = progress + '%';
+    text.textContent = progress + '%';
+
+    if (progress >= 100) {
+      clearInterval(interval);
+      document.querySelector('#loading').style.display = 'none';
+      document.querySelector('h1').style.display = 'none';
+      text.style.display = 'none';
+      document.querySelector('#prank').style.display = 'block';
+      document.getElementById('laugh')?.play();
+    }
+  }, 300);
 </script>
 
 </body>
 </html>
+
