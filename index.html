@@ -22,7 +22,7 @@
 
     #startScreen {
       position: absolute;
-      z-index: 2;
+      z-index: 3;
       top: 0;
       left: 0;
       width: 100%;
@@ -53,7 +53,7 @@
       height: 30px;
       border: 2px solid lime;
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     #bar {
@@ -68,8 +68,26 @@
       margin-bottom: 20px;
     }
 
+    #terminal {
+      width: 80vw;
+      height: 150px;
+      background: black;
+      color: #0f0;
+      font-size: 0.85rem;
+      overflow: auto;
+      border: 1px solid lime;
+      padding: 10px;
+      text-align: left;
+    }
+
     #prank {
       display: none;
+      animation: flash 0.5s infinite alternate;
+    }
+
+    @keyframes flash {
+      from { background-color: black; }
+      to { background-color: darkred; }
     }
 
     #cat {
@@ -84,6 +102,22 @@
       color: red;
       margin-top: 20px;
     }
+
+    #fbiPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      background: black;
+      color: red;
+      border: 2px solid red;
+      padding: 30px;
+      font-size: 1.5rem;
+      text-align: center;
+      animation: flash 0.3s infinite alternate;
+    }
   </style>
 </head>
 <body>
@@ -96,6 +130,7 @@
   <h1>Decrypting Top Secret File...</h1>
   <div id="loading"><div id="bar"></div></div>
   <div id="progressText">0%</div>
+  <div id="terminal"></div>
 
   <div id="prank">
     <img id="cat" src="cat.gif" alt="Cat GIF" />
@@ -104,14 +139,14 @@
   </div>
 </div>
 
+<div id="fbiPopup">🚨 FBI Cybercrime Division Trace Activated<br><br>Trace completes in <span id="countdown">5</span>...</div>
+
 <script>
-  // Matrix Background
+  // Matrix Rain
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
-
   canvas.height = window.innerHeight;
   canvas.width = window.innerWidth;
-
   const letters = "01";
   const fontSize = 14;
   const columns = canvas.width / fontSize;
@@ -126,20 +161,62 @@
     for (let i = 0; i < drops.length; i++) {
       const text = letters[Math.floor(Math.random() * letters.length)];
       ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
       drops[i]++;
     }
   }
 
   setInterval(draw, 33);
 
-  // 🔊 Mobile-friendly start trigger
+  // Terminal
+  const terminal = document.getElementById("terminal");
+  const gibberishLines = [
+    ">> INITIATING CORE BREACH...",
+    "[X] Bypassing firewall protocols",
+    ">> Injecting shellcode.exe",
+    ">> Overriding root partitions...",
+    ">> 0x48FF21 writeblock success",
+    ">> Sudo access granted.",
+    ">> ALPHA STRIKE ARMED",
+    ">> TRIGGER ENGAGED.",
+    "..."
+  ];
+
+  function typeGibberish(lineIndex = 0) {
+    if (lineIndex >= gibberishLines.length) return;
+    let line = gibberishLines[lineIndex];
+    let i = 0;
+    let typer = setInterval(() => {
+      terminal.innerHTML += line[i++];
+      if (i === line.length) {
+        terminal.innerHTML += "<br/>";
+        clearInterval(typer);
+        setTimeout(() => typeGibberish(lineIndex + 1), 400);
+      }
+    }, 30);
+  }
+
+  // FBI countdown then redirect
+  function launchFBISequence() {
+    const popup = document.getElementById("fbiPopup");
+    const countdown = document.getElementById("countdown");
+    popup.style.display = "block";
+    let timeLeft = 5;
+    const timer = setInterval(() => {
+      timeLeft--;
+      countdown.textContent = timeLeft;
+      if (timeLeft === 0) {
+        clearInterval(timer);
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+      }
+    }, 1000);
+  }
+
+  // Start
   document.getElementById('startScreen').addEventListener('click', () => {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('content').style.display = 'flex';
+    typeGibberish();
 
     let progress = 0;
     const bar = document.getElementById('bar');
@@ -155,8 +232,13 @@
         document.querySelector('#loading').style.display = 'none';
         document.querySelector('h1').style.display = 'none';
         text.style.display = 'none';
-        document.querySelector('#prank').style.display = 'block';
+        terminal.style.display = 'none';
+        const prank = document.querySelector('#prank');
+        prank.style.display = 'block';
         document.getElementById('laugh').play();
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+        setTimeout(launchFBISequence, 4000); // FBI alert after 4s
       }
     }, 300);
   });
@@ -164,4 +246,3 @@
 
 </body>
 </html>
-
